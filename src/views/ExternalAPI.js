@@ -1,41 +1,35 @@
 import React, { useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
-
+//todo: https://expressjs.com/en/resources/middleware/cors.html
+//todo: send Access Token to API call
 const ExternalApi = () => {
   const [message, setMessage] = useState("");
-  const serverUrl = process.env.REACT_APP_SERVER_URL;
 
-  const { getAccessTokenSilently } = useAuth0();
+  const [posts, setPosts] = useState(null);
 
   const callApi = async () => {
-    try {
-      const response = await fetch(`${serverUrl}/api/messages/public-message`);
-
-      const responseData = await response.json();
-
-      setMessage(responseData.message);
-    } catch (error) {
+    try{
+      const response = await fetch ("http://localhost:3001/callAPI1");
+      const responsedata = await response.json();
+      console.log(responsedata.message);
+      setMessage(responsedata.message);
+    }
+    catch (error) {
+      console.error(error);
       setMessage(error.message);
     }
   };
 
-  const callSecureApi = async () => {
-    try {
-      const token = await getAccessTokenSilently();
-
-      const response = await fetch(
-        `${serverUrl}/api/messages/protected-message`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      
-      const responseData = await response.json();
-      setMessage(responseData.message);
-    } catch(error){
-      setMessage(error.message);
+  const callProtectedApi = async () => {
+    try{
+      const response = await fetch ("http://localhost:3001/callProtectedAPI");
+      const responsedata = await response.json();
+      console.log(responsedata.message);
+      setMessage(responsedata.message);
+    }
+    catch (error) {
+      console.error(error);
+      setMessage(error.message+"... Do you have the correct scopes?");
     }
   };
 
@@ -43,23 +37,21 @@ const ExternalApi = () => {
       <div className="container">
         <h1>External API</h1>
           <p>
-            Use these buttons to call an external API. The protected API call has an
-            access token in its authorization header. The API server will validate
-            the access token using the Auth0 Audience value.
+            Use these buttons to call an external API. 
           </p>
         <div
           className="btn-group mt-5"
           role="group"
           aria-label="External API Requests Examples"
         >
-          <button type="button" className="btn btn-primary" onClick={callApi}>
+          <button type="button" 
+          className="btn btn-primary" 
+          onClick={callApi}>
             Get Public Message
           </button>
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={callSecureApi}
-          >
+          <button type="button" 
+          className="btn btn-primary" 
+          onClick={callProtectedApi}>
             Get Protected Message
           </button>
         </div>
