@@ -7,7 +7,7 @@ const Auth0ProviderWithHistory = ({ children }) => {
   const clientId = process.env.REACT_APP_AUTH0_CLIENT_ID;
   const history = useHistory();
   const audience = process.env.REACT_APP_AUTH0_AUDIENCE;
-
+  const scope = "openid email profile Call:SecureAPI Read:SecureMessage test:role";
   const onRedirectCallback = (appState) => {
     history.push(appState?.returnTo || window.location.pathname);
   };
@@ -19,6 +19,7 @@ const Auth0ProviderWithHistory = ({ children }) => {
       redirectUri={window.location.origin}
       onRedirectCallback={onRedirectCallback}
       audience={audience}
+      scope={scope}
     >
       {children}
     </Auth0Provider>

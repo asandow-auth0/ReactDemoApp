@@ -1,14 +1,18 @@
 import React, { useState } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 //todo: https://expressjs.com/en/resources/middleware/cors.html
-//todo: send Access Token to API call
+//todo: secure API with scopes
 const ExternalApi = () => {
   const [message, setMessage] = useState("");
 
   const [posts, setPosts] = useState(null);
 
+  const {user, isAuthenticated, getAccessTokenSilently} = useAuth0();
+
+
   const callApi = async () => {
     try{
+      console.log("public api");
       const response = await fetch ("http://localhost:3001/callAPI1");
       const responsedata = await response.json();
       console.log(responsedata.message);
@@ -20,11 +24,33 @@ const ExternalApi = () => {
     }
   };
 
-  const callProtectedApi = async () => {
+  /*const callProtectedApi = async () => {
     try{
+      console.log("protected api");
       const response = await fetch ("http://localhost:3001/callProtectedAPI");
       const responsedata = await response.json();
       console.log(responsedata.message);
+      setMessage(responsedata.message);
+    }
+    catch (error) {
+      console.error(error);
+      setMessage(error.message);
+    }
+  };*/
+
+  const callProtectedApi = async () => 
+  {
+    const domain = "demolab.us.auth0.com";
+    //scope: "openid profile email Call:SecureAPI Read:SecureMessage"
+    try{
+      const accessToken = await getAccessTokenSilently();
+      console.log("Access Token "+accessToken);
+      const response = await fetch ('http://localhost:3001/callProtectedAPI', {
+        headers:{
+          Authorization: 'Bearer '+accessToken,
+        },
+      });
+      const responsedata = await response.json();
       setMessage(responsedata.message);
     }
     catch (error) {
